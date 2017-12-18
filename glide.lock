@@ -1,0 +1,27 @@
+hash: 56a73a57e3a2b6b830237114a8235752cc0e9b14c5ddf2522583a19b3aea93ea
+updated: 2017-12-19T00:29:27.86966552+01:00
+imports:
+- name: github.com/boltdb/bolt
+  version: 2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8
+- name: github.com/bwmarrin/discordgo
+  version: e024d5f0323de5478479d7568c87d69763f4537b
+- name: github.com/gorilla/websocket
+  version: cdedf21e585dae942951e34d6defc3215b4280fa
+- name: github.com/s1kx/unison
+  version: f445392c8f80c56e5c7810ce4e58b91924831ac6
+  subpackages:
+  - events
+  - state
+- name: github.com/Sirupsen/logrus
+  version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
+- name: golang.org/x/crypto
+  version: 244f6ce1f09cc9f3d7bffe29b033aaa13c0cc2f3
+  subpackages:
+  - nacl/secretbox
+  - poly1305
+  - salsa20/salsa
+- name: golang.org/x/sys
+  version: 571f7bbbe08da2a8955aed9d4db316e78630e9a3
+  subpackages:
+  - unix
+testImports: []

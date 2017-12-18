@@ -1,0 +1,4 @@
+package: github.com/andersfylling/jailbot
+import:
+- package: github.com/s1kx/unison
+  version: development

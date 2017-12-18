@@ -12,3 +12,8 @@
 
 # Project-local glide cache, RE: https://github.com/Masterminds/glide/issues/736
 .glide/
+
+vendor/
+
+# per server configuration. TODO: This needs to be backed up(!!!)
+unisonStates.db
