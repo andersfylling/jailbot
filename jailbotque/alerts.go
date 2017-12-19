@@ -35,19 +35,27 @@ func (a *AlertStack) Add(alert *Alert) {
 
 	if uint(len(a.stack)) == a.index {
 		a.stack = append(a.stack, alert)
+		a.index++
 	} else {
 		a.stack[a.index] = alert
 		a.index++
 	}
 }
-func (a *AlertStack) Pop(index uint) (*Alert, error) {
+func (a *AlertStack) Pop() (*Alert, error) {
 	a.Lock()
 	defer a.Unlock()
 
-	if index > 0 {
-		index--
+	if a.index > 0 {
+		a.index--
 		return a.stack[a.index], nil
 	}
 
 	return nil, errors.New("No alerts in stack")
+}
+
+func (a *AlertStack) Size() uint {
+	a.Lock()
+	defer a.Unlock()
+
+	return a.index
 }
