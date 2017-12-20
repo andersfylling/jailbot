@@ -3,9 +3,18 @@ package jailbotque
 import (
 	"errors"
 	"sync"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 type Alert struct {
+	guild  *discordgo.Guild
+	member *discordgo.Member
+	reason *string
+}
+
+func NewAlert(g *discordgo.Guild, m *discordgo.Member, reason *string) *Alert {
+	return &Alert{guild: g, member: m, reason: reason}
 }
 
 type AlertStack struct {
