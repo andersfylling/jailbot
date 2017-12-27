@@ -2,13 +2,16 @@ package main
 
 import (
 	"github.com/Sirupsen/logrus"
-	"github.com/s1kx/unison"
+	"github.com/andersfylling/jailbot/command"
+	"github.com/andersfylling/unison"
 )
 
 func main() {
 	// Create bot structure
-	settings := &unison.BotSettings{
-		Commands:   []*unison.Command{},
+	settings := &unison.Config{
+		Commands: []*unison.Command{
+			command.BanCommand,
+		},
 		EventHooks: []*unison.EventHook{},
 		Services:   []*unison.Service{},
 	}

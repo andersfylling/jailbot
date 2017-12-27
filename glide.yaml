@@ -1,4 +1,6 @@
 package: github.com/andersfylling/jailbot
 import:
-- package: github.com/s1kx/unison
+- package: github.com/andersfylling/unison
   version: development
+- package: github.com/bwmarrin/discordgo
+  version: develop
