@@ -106,12 +106,12 @@ func (t *Topic) Publish(ctx *unison.Context, n *Notification) error {
 	for _, subscriber := range t.Subscribers {
 
 		// make sure the member exist in the subscriber guild
-		_, err := ctx.Discord.GuildMember(n.GuildID, n.UserID)
-		if err != nil {
+		member, err := ctx.Discord.GuildMember(subscriber.GuildID, n.UserID)
+		if err != nil || member == nil {
 			continue
 		}
 
-		userInfo := fmt.Sprintf("<@%s>, %s#%s{id:%s}", n.UserID, n.UserName, n.UserDiscriminator, n.UserID)
+		userInfo := fmt.Sprintf("<@%s>, %s#%s{id:%s}", member.User.ID, member.User.Username, member.User.Discriminator, member.User.ID)
 		msg := fmt.Sprintf("[%s] By Guild %s. User %s for reason `%s`", n.Type, n.GuildName, userInfo, n.Reason)
 		ctx.Discord.ChannelMessageSend(subscriber.ChannelID, msg)
 	}
