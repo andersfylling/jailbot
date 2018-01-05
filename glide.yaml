@@ -1,6 +1,6 @@
 package: github.com/andersfylling/jailbot
 import:
 - package: github.com/andersfylling/unison
-  version: development
-- package: github.com/bwmarrin/discordgo
-  version: develop
+  version: master
+- package: gopkg.in/bwmarrin/Discordgo.v0
+  version: ~0.18.0

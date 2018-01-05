@@ -1,12 +1,12 @@
-hash: a7ac8ca185d2ed826cd8feed5095d127f367fbb94f3aeb2520a2239c76a7be0c
-updated: 2017-12-27T18:49:44.611642619+01:00
+hash: f3f6e3c62b7073972a246d8d6fffd5f19b39cd263e1e9af55b77afc2ff470e49
+updated: 2018-01-05T23:40:22.3573531+01:00
 imports:
 - name: github.com/alexflint/go-arg
   version: 59fccacb2679dde66e0b20ed65bd26178fcbf54e
 - name: github.com/alexflint/go-scalar
   version: 45e5d6cd8605faef82fda2bacc59e734a0b6f1f0
 - name: github.com/andersfylling/unison
-  version: 7c9206ba4ba9c662d1ef7d6c518b2d303c2ff501
+  version: cbfc4018d7a66aba372013e478f76f1a3ec37b26
   subpackages:
   - constant
   - events
@@ -14,21 +14,25 @@ imports:
 - name: github.com/boltdb/bolt
   version: 2f1ce7a837dcb8da3ec595b1dac9d0632f0f99e8
 - name: github.com/bwmarrin/discordgo
-  version: e6ed3d579b4a6d5e972f83583ff512813d07020d
+  version: b58212ae336d123c4191b621c71fd8e3af08b18e
 - name: github.com/gorilla/websocket
-  version: cdedf21e585dae942951e34d6defc3215b4280fa
+  version: 71fa72d4842364bc5f74185f4161e0099ea3624a
 - name: github.com/kballard/go-shellquote
   version: cd60e84ee657ff3dc51de0b4f55dd299a3e136f2
 - name: github.com/Sirupsen/logrus
   version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
+- name: github.com/sirupsen/logrus
+  version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
 - name: golang.org/x/crypto
-  version: d585fd2cc9195196078f516b69daff6744ef5e84
+  version: 9419663f5a44be8b34ca85f08abc5fe1be11f8a3
   subpackages:
   - nacl/secretbox
   - poly1305
   - salsa20/salsa
 - name: golang.org/x/sys
-  version: 83801418e1b59fb1880e363299581ee543af32ca
+  version: 686000749eaec0b8855b8eef5336cf63899fe51d
   subpackages:
   - unix
+- name: gopkg.in/bwmarrin/Discordgo.v0
+  version: 4a33b9bc7c56cfdb9bb244e33e83cb3941fe2bdc
 testImports: []
