@@ -4,10 +4,10 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/Sirupsen/logrus"
 	"github.com/andersfylling/jailbot/notify"
 	"github.com/andersfylling/unison"
-	"github.com/bwmarrin/discordgo"
+	"github.com/sirupsen/logrus"
+	"gopkg.in/bwmarrin/Discordgo.v0"
 )
 
 var BanCommandArgs struct {
@@ -87,14 +87,22 @@ func banCommandAction(ctx *unison.Context, m *discordgo.Message, request string)
 		return errors.New("Unable to get guild information using guildID: " + guildID)
 	}
 
-	// ban member from guild
-	ctx.Discord.GuildBanCreate(guildID, userID, days)
-	logrus.Info(fmt.Sprintf("Banned user %s{id:%s} from Guild %s with reason %s", member.User.String(), userID, guildID, reason))
-
 	guild, _ := ctx.Discord.Guild(guildID)
 	notification := notify.NewBanNotification(userID, member.User.Username, member.User.Discriminator, guild.Name, guildID, guild.MemberCount, reason)
 
 	notify.Publish(ctx, notification)
+
+	// ban member from guild
+	err = ctx.Discord.GuildBanCreate(guildID, userID, days)
+	if err != nil {
+		return err
+	}
+	logrus.Info(fmt.Sprintf("Banned user %s{id:%s} from Guild %s with reason %s", member.User.String(), userID, guildID, reason))
+	//
+	// guild, _ := ctx.Discord.Guild(guildID)
+	// notification := notify.NewBanNotification(userID, member.User.Username, member.User.Discriminator, guild.Name, guildID, guild.MemberCount, reason)
+	//
+	// notify.Publish(ctx, notification)
 
 	// let the moderator know what has been done
 	msg := fmt.Sprintf("Banned user %s{id:%s} and removed messages within the last %d days", member.User.String(), userID, days)
