@@ -17,6 +17,7 @@ var SubscribeGuildHook = &unison.EventHook{
 	OnEvent: unison.EventHandlerFunc(subscribeGuildHookAction),
 	Events: []events.EventType{
 		events.GuildCreateEvent,
+		events.GuildUpdateEvent,
 	},
 }
 
@@ -43,6 +44,10 @@ func subscribeGuildHookAction(ctx *unison.Context, event *events.DiscordEvent, s
 		return true, nil
 	case *discordgo.GuildCreate:
 		guild = ev.Guild
+		break
+	case *discordgo.GuildUpdate:
+		guild = ev.Guild
+		break
 	}
 
 	channels, err := ctx.Discord.GuildChannels(guild.ID)

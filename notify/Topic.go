@@ -36,6 +36,13 @@ func (t *Topic) Subscribe(gid, cid string) (*Subscription, error) {
 	t.Lock()
 	defer t.Unlock()
 
+	// check if already subscribed
+	for _, sub := range t.Subscribers {
+		if sub.GuildID == gid && sub.ChannelID == cid {
+			return sub, errors.New("guild has already subscribed with this channel")
+		}
+	}
+
 	sub := NewSubscription(gid, cid)
 
 	// check if there are any available spots
