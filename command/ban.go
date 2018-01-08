@@ -90,7 +90,7 @@ func banCommandAction(ctx *unison.Context, m *discordgo.Message, request string)
 	}
 
 	// ban member from guild
-	err = ctx.Discord.GuildBanCreate(guildID, userID, days)
+	err = ctx.Discord.GuildBanCreateWithReason(guildID, userID, reason, days)
 	if err != nil {
 		return err
 	}
