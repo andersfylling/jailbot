@@ -34,24 +34,25 @@ func permissionRole(ctx *unison.Context, m *discordgo.Message) bool {
 	return (authorPermissions & required) == required
 }
 
-func retrieveTargetUserID(request string) string {
+func retrieveTargetUserID(request string /*, args BanCommandArgs*/) string {
+	args := BanCommandArgs // create a copy
 	// --user="username#1234" .. neh
 	// --userid="57435436543523345657"
 	// --uid="57438745734657"
 	// @mention, another user might be mentioned in a option or later.. first mention(?)
 
-	if BanCommandArgs.User != "" {
+	if args.User != "" {
 		var mention string
-		if BanCommandArgs.User[:3] == "<@!" { // nickname
+		if args.User[:3] == "<@!" { // nickname
 			mention = "<@!"
-		} else if BanCommandArgs.User[:2] == "<@" {
+		} else if args.User[:2] == "<@" {
 			mention = "<@"
 		} else {
 			return ""
 		}
-		return BanCommandArgs.User[len(mention) : len(BanCommandArgs.User)-len(">")] // Extracts uid from eg. <@237293823443199860>
-	} else if BanCommandArgs.UserID != "" {
-		return BanCommandArgs.UserID
+		return args.User[len(mention) : len(args.User)-len(">")] // Extracts uid from eg. <@237293823443199860>
+	} else if args.UserID != "" {
+		return args.UserID
 	} else {
 		// mention
 		if request == "" {
@@ -88,7 +89,7 @@ func banCommandAction(ctx *unison.Context, m *discordgo.Message, request string)
 	}
 	logrus.Info("[BanCommand] Detected channel id")
 	guildID := channel.GuildID
-	userID := retrieveTargetUserID(request)
+	userID := retrieveTargetUserID(request) //, BanCommandArgs will be used here
 	reason := BanCommandArgs.Reason
 	days := BanCommandArgs.Days // remove all messages from the last X days
 
