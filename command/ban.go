@@ -36,10 +36,11 @@ func permissionRole(ctx *unison.Context, m *discordgo.Message) bool {
 
 func retrieveTargetUserID(request string /*, args BanCommandArgs*/) string {
 	args := BanCommandArgs // create a copy
-	// --user="username#1234" .. neh
-	// --userid="57435436543523345657"
-	// --uid="57438745734657"
-	// @mention, another user might be mentioned in a option or later.. first mention(?)
+	// --user="<@57435436543523345657>", --user="<@!57435436543523345657>", -u="<@57435436543523345657>"
+	// --userid="57435436543523345657", --i="57438745734657"
+	//
+	// just mention: ban @user
+	// 	Assumption: the first mention if --user nor --userid is set, is the target user
 
 	if args.User != "" {
 		var mention string
@@ -89,7 +90,7 @@ func banCommandAction(ctx *unison.Context, m *discordgo.Message, request string)
 	}
 	logrus.Info("[BanCommand] Detected channel id")
 	guildID := channel.GuildID
-	userID := retrieveTargetUserID(request) //, BanCommandArgs will be used here
+	userID := retrieveTargetUserID(request) //, BanCommandArgs will be used here, copy on run
 	reason := BanCommandArgs.Reason
 	days := BanCommandArgs.Days // remove all messages from the last X days
 

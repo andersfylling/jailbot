@@ -16,6 +16,10 @@ const (
 	TypeNotice NotificationType = "NOTICE" // general way of reporting behavior..
 )
 
+func ToStr(nt NotificationType) string {
+	return string(nt)
+}
+
 type Notification struct {
 	Type NotificationType
 

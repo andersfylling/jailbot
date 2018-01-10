@@ -13,12 +13,16 @@ func main() {
 	settings := &unison.Config{
 		Commands: []*unison.Command{
 			command.BanCommand,
+			command.RecordsCommand,
 		},
 		EventHooks: []*unison.EventHook{
 			hook.SubscribeGuildHook,
 			hook.MemberEventHook,
+			hook.UserJoinedHook,
 		},
 		Services: []*unison.Service{},
+
+		EnvironmentPrefix: "JAILBOT", // put jailbot prefix on every environment variable
 	}
 
 	// Start the bot

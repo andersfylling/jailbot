@@ -182,8 +182,8 @@ func memberEventHookAction(ctx *unison.Context, event *events.DiscordEvent, self
 	}
 	//  3. create new EventDocument with Type == ban
 	eventDoc := &document.EventDocument{
-		GuildID: guildDoc.ID,
-		UserID:  userDoc.ID,
+		GuildID: guildDoc.DiscordID,
+		UserID:  userDoc.DiscordID,
 		Type:    eventType,
 		Reason:  auditEntry.Reason,
 	}

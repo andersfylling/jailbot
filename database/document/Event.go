@@ -8,8 +8,8 @@ import (
 
 type EventDocument struct {
 	ID      bson.ObjectId           `json:"_id" bson:"_id,omitempty"`
-	GuildID bson.ObjectId           `json:"guildid"`
-	UserID  bson.ObjectId           `json:"userid"`
+	GuildID string                  `json:"guildid"` // discord guild id
+	UserID  string                  `json:"userid"`  // discord user id
 	Type    notify.NotificationType `json:"type"`
 	Reason  string                  `json:"reason"`
 }
