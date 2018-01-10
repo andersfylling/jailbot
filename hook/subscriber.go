@@ -11,6 +11,8 @@ import (
 	"gopkg.in/bwmarrin/Discordgo.v0"
 )
 
+const notificationChannelKey string = "jailbotNotifyChan"
+
 var SubscribeGuildHook = &unison.EventHook{
 	Name:    "subscribeguild",
 	Usage:   "Check if a guild has the required channel and auto-subscribe if so",
@@ -66,6 +68,15 @@ func subscribeGuildHookAction(ctx *unison.Context, event *events.DiscordEvent, s
 
 	if channel == nil {
 		return true, errors.New("Could not find a notification channel for jailbot")
+	}
+
+	// add subscription channel to guild bucket if it doesn't exist
+	if byteArr, _ := ctx.Bot.GetGuildValue(guild.ID, notificationChannelKey); len(byteArr) == 0 {
+		channelID := []byte(channel.ID)
+		err = ctx.Bot.SetGuildValue(guild.ID, notificationChannelKey, channelID)
+		if err != nil {
+			logrus.Errorf("[JailBot] unable to set guild notification channel: %s", err.Error())
+		}
 	}
 
 	// subscribe to all events
