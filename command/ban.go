@@ -3,6 +3,7 @@ package command
 import (
 	"errors"
 	"fmt"
+	"regexp"
 
 	"github.com/andersfylling/unison"
 	"github.com/sirupsen/logrus"
@@ -33,23 +34,45 @@ func permissionRole(ctx *unison.Context, m *discordgo.Message) bool {
 	return (authorPermissions & required) == required
 }
 
-func retrieveTargetUserID() string {
+func retrieveTargetUserID(request string) string {
 	// --user="username#1234" .. neh
 	// --userid="57435436543523345657"
 	// --uid="57438745734657"
 	// @mention, another user might be mentioned in a option or later.. first mention(?)
 
 	if BanCommandArgs.User != "" {
-		return BanCommandArgs.User[len("<@") : len(BanCommandArgs.User)-len(">")] // Extracts uid from eg. <@237293823443199860>
+		var mention string
+		if BanCommandArgs.User[:3] == "<@!" { // nickname
+			mention = "<@!"
+		} else if BanCommandArgs.User[:2] == "<@" {
+			mention = "<@"
+		} else {
+			return ""
+		}
+		return BanCommandArgs.User[len(mention) : len(BanCommandArgs.User)-len(">")] // Extracts uid from eg. <@237293823443199860>
 	} else if BanCommandArgs.UserID != "" {
 		return BanCommandArgs.UserID
+	} else {
+		// mention
+		if request == "" {
+			return ""
+		}
+		userIDPattern := regexp.MustCompile("<@[^>]*>")
+		mention := userIDPattern.FindString(request)
+
+		userStr := mention[2 : len(mention)-1]
+		// if a nickname is used, this will contain a prefix of `!`
+		var userID string
+		if userStr[:1] == "!" {
+			userID = userStr[1:len(userStr)]
+		} else {
+			userID = userStr
+		}
+
+		return userID
 	} //else if BanCommandArgs.UserName != "" {
 	//	return BanCommandArgs.UserName // TODO extract username+discriminator and find a user id
 	//}
-
-	// TODO: should users be able to mention someone without using a --user optional?
-
-	return ""
 }
 
 func banCommandAction(ctx *unison.Context, m *discordgo.Message, request string) error {
@@ -65,7 +88,7 @@ func banCommandAction(ctx *unison.Context, m *discordgo.Message, request string)
 	}
 	logrus.Info("[BanCommand] Detected channel id")
 	guildID := channel.GuildID
-	userID := retrieveTargetUserID()
+	userID := retrieveTargetUserID(request)
 	reason := BanCommandArgs.Reason
 	days := BanCommandArgs.Days // remove all messages from the last X days
 
