@@ -4,8 +4,6 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/andersfylling/jailbot/database/document"
-	"github.com/andersfylling/jailbot/notify"
 	"github.com/andersfylling/unison"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/bwmarrin/Discordgo.v0"
@@ -69,7 +67,6 @@ func banCommandAction(ctx *unison.Context, m *discordgo.Message, request string)
 	guildID := channel.GuildID
 	userID := retrieveTargetUserID()
 	reason := BanCommandArgs.Reason
-	labels := ""
 	days := BanCommandArgs.Days // remove all messages from the last X days
 
 	if userID == "" {
@@ -99,74 +96,6 @@ func banCommandAction(ctx *unison.Context, m *discordgo.Message, request string)
 	// let the moderator know what has been done
 	msg := fmt.Sprintf("Banned user %s{id:%s} and removed messages within the last %d days", member.User.String(), userID, days)
 	_, err = ctx.Bot.Discord.ChannelMessageSend(m.ChannelID, msg)
-	guild, _ := ctx.Discord.Guild(guildID)
-
-	// save ban to database
-	// 	1. check if user exist in db
-	userDoc := &document.UserDocument{
-		DiscordID: member.User.ID,
-	}
-	err = userDoc.GetExisting()
-	if err != nil { // user not found
-		user := member.User
-		userDoc.Avatar = user.Avatar
-		userDoc.Bot = user.Bot
-		userDoc.Discriminator = user.Discriminator
-		userDoc.Email = user.Email
-		userDoc.MFAEnabled = user.MFAEnabled
-		userDoc.Token = user.Token
-		userDoc.Username = user.Username
-		userDoc.Verified = user.Verified
-
-		// 1.1 if it doesnt exist, save it to db
-		id, err := userDoc.Insert()
-		if err != nil {
-			// unable to save...
-			return err
-		}
-
-		// saved
-		userDoc.ID = id
-	}
-	//  2. check if guild exist in db
-	guildDoc := &document.GuildDocument{
-		DiscordID: guild.ID,
-	}
-	err = guildDoc.GetExisting()
-	if err != nil { // guild not found
-		guildDoc.Icon = guild.Icon
-		guildDoc.Name = guild.Name
-		guildDoc.OwnerID = guild.OwnerID
-		guildDoc.Region = guild.Region
-
-		// 2.1 if it doesnt exist, save it to db
-		id, err := guildDoc.Insert()
-		if err != nil {
-			// unable to save...
-			return err
-		}
-
-		// saved
-		guildDoc.ID = id
-	}
-	//  3. create new EventDocument with Type == ban
-	eventDoc := &document.EventDocument{
-		GuildID: guildDoc.ID,
-		UserID:  userDoc.ID,
-		Type:    document.EventTypeBan,
-		Reason:  reason,
-		Labels:  labels,
-	}
-	//  4. save
-	_, err = eventDoc.Insert()
-	if err != nil {
-		return err
-	}
-
-	// publish news
-	notification := notify.NewBanNotification(userID, member.User.Username, member.User.Discriminator, guild.Name, guildID, guild.MemberCount, reason)
-
-	notify.Publish(ctx, notification)
 
 	return err
 }

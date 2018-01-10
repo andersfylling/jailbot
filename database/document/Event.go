@@ -2,23 +2,16 @@ package document
 
 import (
 	"github.com/andersfylling/jailbot/database/dbsession"
+	"github.com/andersfylling/jailbot/notify"
 	"gopkg.in/mgo.v2/bson"
 )
 
-const (
-	EventTypeBan uint8 = iota
-	EventTypeUnban
-	EventTypeKick
-	EventTypeReport
-)
-
 type EventDocument struct {
-	ID      bson.ObjectId `json:"_id" bson:"_id,omitempty"`
-	GuildID bson.ObjectId `json:"guildid"`
-	UserID  bson.ObjectId `json:"userid"`
-	Type    uint8         `json:"type"`
-	Reason  string        `json:"reason"`
-	Labels  string        `json:"labels"`
+	ID      bson.ObjectId           `json:"_id" bson:"_id,omitempty"`
+	GuildID bson.ObjectId           `json:"guildid"`
+	UserID  bson.ObjectId           `json:"userid"`
+	Type    notify.NotificationType `json:"type"`
+	Reason  string                  `json:"reason"`
 }
 
 const EventDocumentCollection string = "event"

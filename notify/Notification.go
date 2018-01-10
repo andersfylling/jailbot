@@ -1,6 +1,11 @@
 package notify
 
-import "time"
+import (
+	"time"
+
+	"github.com/andersfylling/unison"
+	"gopkg.in/bwmarrin/Discordgo.v0"
+)
 
 type NotificationType string
 
@@ -40,6 +45,24 @@ func NewNotification(t NotificationType, userid, username, userdiscriminator, gu
 		GuildSize: guildsize,
 
 		Reason: reason,
+
+		Date: time.Now(),
+	}
+}
+
+func NewNotification2(t NotificationType, user *discordgo.User, guild *discordgo.Guild, auditEntry *unison.AuditLogEntry) *Notification {
+	return &Notification{
+		Type: t,
+
+		UserID:            user.ID,
+		UserName:          user.Username,
+		UserDiscriminator: user.Discriminator,
+
+		GuildID:   guild.ID,
+		GuildName: guild.Name,
+		GuildSize: guild.MemberCount,
+
+		Reason: auditEntry.Reason,
 
 		Date: time.Now(),
 	}

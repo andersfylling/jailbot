@@ -16,6 +16,7 @@ func main() {
 		},
 		EventHooks: []*unison.EventHook{
 			hook.SubscribeGuildHook,
+			hook.MemberEventHook,
 		},
 		Services: []*unison.Service{},
 	}
