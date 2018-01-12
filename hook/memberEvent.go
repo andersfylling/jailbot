@@ -5,13 +5,16 @@ import (
 	"errors"
 	"fmt"
 	"strconv"
+	"time"
 
+	"github.com/andersfylling/jailbot/database/dbsession"
 	"github.com/andersfylling/jailbot/database/document"
 	"github.com/andersfylling/jailbot/notify"
 	"github.com/andersfylling/unison"
 	"github.com/andersfylling/unison/events"
 	"github.com/sirupsen/logrus"
 	"gopkg.in/bwmarrin/Discordgo.v0"
+	"gopkg.in/mgo.v2/bson"
 )
 
 const memberEventAuditLogEntriesLimit = 10
@@ -31,6 +34,7 @@ func memberEventHookAction(ctx *unison.Context, event *events.DiscordEvent, self
 	var guildID string
 	var user *discordgo.User
 	var removed bool
+	var unban bool
 
 	// Convert the interface into its correct type
 	switch ev := event.Event.(type) {
@@ -39,6 +43,7 @@ func memberEventHookAction(ctx *unison.Context, event *events.DiscordEvent, self
 	case *discordgo.GuildBanRemove:
 		user = ev.User
 		guildID = ev.GuildID
+		unban = true
 		break
 	case *discordgo.GuildMemberRemove:
 		user = ev.User
@@ -196,6 +201,31 @@ func memberEventHookAction(ctx *unison.Context, event *events.DiscordEvent, self
 	// publish
 	notification := notify.NewNotification2(eventType, user, guild, auditEntry)
 	notify.Publish(ctx, notification)
+
+	// unban events should update ban records to reflect it was temporary
+	if unban {
+		logrus.Info("[memberEvent] unban")
+		ses, collection, err := dbsession.GetCollection(document.EventDocumentCollection)
+		if err != nil {
+			return true, err
+		}
+		defer ses.Close()
+
+		var lastBanDoc document.EventDocument
+		err = collection.Find(bson.M{"guildid": guild.ID, "userid": user.ID, "type": notify.TypeBan}).Sort("-$natural").Limit(1).One(&lastBanDoc)
+		if lastBanDoc.ID == "" {
+			if err != nil {
+				return true, err
+			}
+			return true, errors.New("No ban events found for given user")
+		}
+
+		// update entry
+		err = collection.Update(bson.M{"_id": lastBanDoc.ID}, bson.M{"$set": bson.M{"banremoved": true, "banremoveddate": time.Now()}})
+		if err != nil {
+			return true, err
+		}
+	}
 
 	return true, nil
 }
