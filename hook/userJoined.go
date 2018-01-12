@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/andersfylling/jailbot/database/dbsession"
 	"github.com/andersfylling/jailbot/database/document"
@@ -86,7 +87,18 @@ func GetMemberRecords(ctx *unison.Context, member *discordgo.Member, guild *disc
 			guildName = guild.Name // don't query the discord api due to potential rate limit issues
 			// TODO: the name will be stored in the database
 		}
-		recordsBuffer.WriteString(fmt.Sprintf("%d. [%s] %s: --%s--\n", i, guildName, notify.ToStr(record.Type), record.Reason))
+		eventType := notify.ToStr(record.Type)
+		if record.BanRemoved {
+			// add number of days as a suffix
+			// BAN(3days)
+			start := record.ID.Time()
+			end := record.BanRemovedDate
+			diff := end.Sub(start)
+			nrOfDays := int(diff.Hours() / 24)
+
+			eventType += "(" + strconv.Itoa(nrOfDays) + "days)"
+		}
+		recordsBuffer.WriteString(fmt.Sprintf("%d. [%s] %s: --%s--\n", i, guildName, eventType, record.Reason))
 
 		recordsLength++
 	}
