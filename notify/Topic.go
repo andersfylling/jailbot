@@ -2,21 +2,22 @@ package notify
 
 import (
 	"errors"
-	"fmt"
 	"sync"
 
+	"github.com/andersfylling/jailbot/common"
+	"github.com/andersfylling/jailbot/commonutil"
 	"github.com/andersfylling/unison"
 )
 
 type Topic struct {
-	Type          NotificationType
+	Type          common.NotificationType
 	Subscribers   []*Subscription
 	freePositions []int
 	index         int
 	sync.RWMutex
 }
 
-func NewTopic(nt NotificationType) *Topic {
+func NewTopic(nt common.NotificationType) *Topic {
 	t := &Topic{}
 
 	t.Type = nt
@@ -113,13 +114,12 @@ func (t *Topic) Publish(ctx *unison.Context, n *Notification) error {
 	for _, subscriber := range t.Subscribers {
 
 		// make sure the member exist in the subscriber guild
-		member, err := ctx.Discord.GuildMember(subscriber.GuildID, n.UserID)
+		member, err := ctx.Discord.GuildMember(subscriber.GuildID, n.User.ID)
 		if err != nil || member == nil {
 			continue
 		}
 
-		userInfo := fmt.Sprintf("<@%s>, %s#%s{id:%s}", member.User.ID, member.User.Username, member.User.Discriminator, member.User.ID)
-		msg := fmt.Sprintf("[%s] By Guild %s. User %s for reason `%s`", n.Type, n.GuildName, userInfo, n.Reason)
+		msg := commonutil.FmtEventRecordToStr(n.Record, n.Guild, n.User)
 		ctx.Discord.ChannelMessageSend(subscriber.ChannelID, msg)
 	}
 

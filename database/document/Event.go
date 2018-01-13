@@ -3,8 +3,8 @@ package document
 import (
 	"time"
 
+	"github.com/andersfylling/jailbot/common"
 	"github.com/andersfylling/jailbot/database/dbsession"
-	"github.com/andersfylling/jailbot/notify"
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -12,7 +12,7 @@ type EventDocument struct {
 	ID             bson.ObjectId           `json:"_id" bson:"_id,omitempty"`
 	GuildID        string                  `json:"guildid"` // discord guild id
 	UserID         string                  `json:"userid"`  // discord user id
-	Type           notify.NotificationType `json:"type"`
+	Type           common.NotificationType `json:"type"`
 	Reason         string                  `json:"reason"`
 	BanRemoved     bool                    `json:"banremoved"`
 	BanRemovedDate time.Time               `json:"banremoveddate"`

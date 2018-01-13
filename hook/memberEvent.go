@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/andersfylling/jailbot/common"
 	"github.com/andersfylling/jailbot/database/dbsession"
 	"github.com/andersfylling/jailbot/database/document"
 	"github.com/andersfylling/jailbot/notify"
@@ -96,7 +97,7 @@ func memberEventHookAction(ctx *unison.Context, event *events.DiscordEvent, self
 		return true, err
 	}
 
-	var eventType notify.NotificationType
+	var eventType common.NotificationType
 	var auditEntry *unison.AuditLogEntry
 
 	// find out what happened
@@ -199,7 +200,7 @@ func memberEventHookAction(ctx *unison.Context, event *events.DiscordEvent, self
 	}
 
 	// publish
-	notification := notify.NewNotification2(eventType, user, guild, auditEntry)
+	notification := notify.NewNotification(eventType, eventDoc, user, guild)
 	notify.Publish(ctx, notification)
 
 	// unban events should update ban records to reflect it was temporary

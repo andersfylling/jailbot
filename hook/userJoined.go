@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"strconv"
 
+	"github.com/andersfylling/jailbot/commonutil"
 	"github.com/andersfylling/jailbot/database/dbsession"
 	"github.com/andersfylling/jailbot/database/document"
 	"github.com/andersfylling/jailbot/notify"
@@ -55,6 +56,7 @@ func GetMemberRecords(ctx *unison.Context, member *discordgo.Member, guild *disc
 	var nrOfUnbans int
 	var nrOfKicks int
 	var nrOfIncidents int
+	nrOfCriminalRecords := len(records)
 	for _, record := range records {
 		switch record.Type {
 		case notify.TypeBan:
@@ -68,6 +70,7 @@ func GetMemberRecords(ctx *unison.Context, member *discordgo.Member, guild *disc
 			break
 		case notify.TypeUnban:
 			nrOfUnbans++
+			nrOfCriminalRecords--
 			break
 		}
 	}
@@ -76,30 +79,18 @@ func GetMemberRecords(ctx *unison.Context, member *discordgo.Member, guild *disc
 	var recordsBuffer bytes.Buffer
 	recordsLength := 0
 	for ii, record := range records {
+		if record.Type == notify.TypeUnban {
+			continue
+		}
 		i := ii + 1
 		if recordsBuffer.Len() > 1000 {
 			recordsBuffer.WriteString("...\n")
 			break
 		}
-		guild, err := ctx.Discord.Guild(record.GuildID)
-		guildName := "?"
-		if err == nil {
-			guildName = guild.Name // don't query the discord api due to potential rate limit issues
-			// TODO: the name will be stored in the database
-		}
-		eventType := notify.ToStr(record.Type)
-		if record.BanRemoved {
-			// add number of days as a suffix
-			// BAN(3days)
-			start := record.ID.Time()
-			end := record.BanRemovedDate
-			diff := end.Sub(start)
-			nrOfDays := int(diff.Hours() / 24)
+		guild, _ := ctx.Discord.Guild(record.GuildID)
+		// TODO: the name should be stored in the database. Dont query discord api due to ratelimiting
 
-			eventType += "(" + strconv.Itoa(nrOfDays) + "days)"
-		}
-		recordsBuffer.WriteString(fmt.Sprintf("%d. [%s] %s: --%s--\n", i, guildName, eventType, record.Reason))
-
+		recordsBuffer.WriteString(strconv.Itoa(i) + ". " + commonutil.FmtEventRecordToStr(record, guild, nil))
 		recordsLength++
 	}
 
@@ -108,9 +99,9 @@ func GetMemberRecords(ctx *unison.Context, member *discordgo.Member, guild *disc
 	reportBuffer.WriteString("Report for user <@" + member.User.ID + ">\n")
 	reportBuffer.WriteString("```markdown\n")
 	reportBuffer.WriteString(fmt.Sprintf("# Summary about %s\n", member.User.String()))
-	reportBuffer.WriteString(fmt.Sprintf("* Registered records: %d\n", len(records)))
+	reportBuffer.WriteString(fmt.Sprintf("* Registered records: %d\n", nrOfCriminalRecords))
 	if nrOfBans > 0 {
-		reportBuffer.WriteString(fmt.Sprintf("* Bans: %d, where %d were temporary\n", nrOfBans, nrOfUnbans))
+		reportBuffer.WriteString(fmt.Sprintf("* Bans: %d, where %d was revoked\n", nrOfBans, nrOfUnbans))
 	}
 	if nrOfKicks > 0 {
 		reportBuffer.WriteString(fmt.Sprintf("* Kicks: %d\n", nrOfKicks))
@@ -119,7 +110,7 @@ func GetMemberRecords(ctx *unison.Context, member *discordgo.Member, guild *disc
 		reportBuffer.WriteString(fmt.Sprintf("* Behavior reports: %d\n", nrOfIncidents))
 	}
 	reportBuffer.WriteString("\n")
-	reportBuffer.WriteString(fmt.Sprintf("# Records %d/%d\n", recordsLength, len(records)))
+	reportBuffer.WriteString(fmt.Sprintf("# Records %d/%d\n", recordsLength, nrOfCriminalRecords))
 	reportBuffer.WriteString(recordsBuffer.String())
 	reportBuffer.WriteString("```")
 

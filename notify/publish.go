@@ -1,14 +1,15 @@
 package notify
 
 import (
+	"github.com/andersfylling/jailbot/common"
 	"github.com/andersfylling/unison"
 	"github.com/sirupsen/logrus"
 )
 
-var topics map[NotificationType]*Topic
+var topics map[common.NotificationType]*Topic
 
 func init() {
-	topics = make(map[NotificationType]*Topic)
+	topics = make(map[common.NotificationType]*Topic)
 	topics[TypeBan] = NewBanTopic()
 	topics[TypeKick] = NewTopic(TypeKick)
 	topics[TypeUnban] = NewTopic(TypeUnban)
